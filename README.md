@@ -8,10 +8,10 @@ Originally designed for modular tooling environments, it now serves as a public 
 ---
 
 ## Key Features
-- ✅ **Integrity Verification** — Prevents tampering with packaged artifacts via SHA-256 validation.
-- 🔑 **RSA Signature Validation** — Verifies authenticity of encrypted licenses using embedded public keys.
-- 🧩 **Rank-Based Module Gating** — Modules are loaded according to verified license rank.
-- ⚙️ **Cross-Platform Build Automation** — Clean Gradle + Bash workflow for building and packaging releases.
+- **Integrity Verification** — Prevents tampering with packaged artifacts via SHA-256 validation.
+- **RSA Signature Validation** — Verifies authenticity of encrypted licenses using embedded public keys.
+- **Rank-Based Module Gating** — Modules are loaded according to verified license rank.
+- **Cross-Platform Build Automation** — Clean Gradle + Bash workflow for building and packaging releases.
 
 ---
 
