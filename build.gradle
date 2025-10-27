@@ -1,0 +1,65 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'com.bedrock'
+version = '1.0.0-demo'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    // Core JSON serialization
+    implementation 'com.google.code.gson:gson:2.10.1'
+}
+
+// Set the default entry point for `gradlew run`
+application {
+    mainClass = 'com.bedrock.demo.PatternBuilderModule'
+}
+
+// === Custom Tasks ===
+
+// Generate integrity hash for the final JAR
+tasks.register('writeIntegrityHash') {
+    description = 'Writes a fake integrity hash file for the Bedrock Foundation build.'
+    group = 'build'
+    doLast {
+        def buildDir = layout.buildDirectory.get().asFile
+        def jarFile = file("${buildDir}/libs/${project.name}-${version}.jar")
+        def hashFile = file("${buildDir}/generated-resources/bedrock_integrity.properties")
+
+        if (!jarFile.exists()) {
+            println "⚠️  JAR not found — run ./gradlew build first."
+            return
+        }
+
+        def sha256 = java.security.MessageDigest.getInstance("SHA-256")
+        jarFile.withInputStream { is ->
+            byte[] buffer = new byte[8192]
+            int bytesRead
+            while ((bytesRead = is.read(buffer)) != -1)
+                sha256.update(buffer, 0, bytesRead)
+        }
+        def digest = sha256.digest().collect { String.format("%02x", it) }.join()
+        hashFile.parentFile.mkdirs()
+        hashFile.text = "bedrock.integrity.hash=${digest}"
+        println "✅  Integrity hash written to: ${hashFile}"
+    }
+}
+
+// Simulate rank-based license generation (sanitized)
+tasks.register('runLicenseGen', JavaExec) {
+    description = 'Runs the sanitized Engine.java to generate mock licenses.'
+    group = 'distribution'
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.bedrock.core.Engine'
+
+    // Pass rank argument if specified: `--args="DEV"`
+    args project.hasProperty('args') ? project.args.split(' ') : []
+}
+
+// Hook the hash writer after each successful build
+tasks.build.finalizedBy(tasks.writeIntegrityHash)
